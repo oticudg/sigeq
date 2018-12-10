@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ { UserStoreRequest, UserUpdateRequest, ChangePasswordRequest };
 use App\User;
-use App\Models\Module;
+use App\Models\{ Specialty };
 use App\Models\Permisologia\Role;
 
 class UsersController extends Controller
@@ -58,6 +58,7 @@ class UsersController extends Controller
         $user->save();
         $user->roles()->attach($data['roles']);
         $user->assignPermissionsOneUser($data['roles']);
+        $user->update_pivot($data['speciality_id'], 'specialties', 'specialty_id');
         return response()->json($user);
     }
 
@@ -72,6 +73,11 @@ class UsersController extends Controller
         $user = User::findOrFail($id);
         $user->fullName = $user->fullName();
         $user->roles->pluck('name')->toArray();
+        $specialties = $user->specialties->each(function ($s) {
+            $s->text = $s->intervention->name . ' - ' . $s->name;
+        })->pluck('text')->toArray();
+        unset($user->specialties);
+        $user->specialities = $specialties;
         return response()->json($user);
     }
 
@@ -97,6 +103,7 @@ class UsersController extends Controller
 
         $user = User::findOrFail($id)->fill($data);
         $user->update_pivot($data['roles'], 'roles', 'role_id');
+        $user->update_pivot($data['speciality_id'], 'specialties', 'specialty_id');
         $user->assignPermissionsOneUser($data['roles']);
 
         return response()->json($user->save());
@@ -136,7 +143,12 @@ class UsersController extends Controller
     public function dataForRegister()
     {
         $roles = Role::all()->pluck('name');
-        return response()->json(compact(['roles']));
+        $specialties = Specialty::get(['id', 'name as text', 'intervention_id']);
+        $specialties->each(function ($s) {
+            $s->text = $s->intervention->name . ' - ' . $s->text;
+            unset($s->intervention, $s->intervention_id);
+        });
+        return response()->json(compact('roles', 'specialties'));
     }
 
 }

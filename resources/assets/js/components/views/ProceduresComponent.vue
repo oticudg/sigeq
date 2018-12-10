@@ -46,6 +46,9 @@
                       <span class="fa fa-pencil"></span>
                       <label>Especifique el procedimiento y presione enter.</label>
                       <input type="text" class="form-control" placeholder="Enter ..." v-model="procedure" @keypress.enter.prevent="register(1)">
+                      <button type="button" class="btn btn-primary" @click="register(1)">
+                        <i class="fa fa-plus"></i>
+                      </button>
                     </li>
                   </ul>
                 </div>
@@ -89,7 +92,10 @@
                     <span class="text">Otro</span><br>
                     <span class="fa fa-pencil"></span>
                     <label>Especifique el procedimiento y presione enter.</label>
-                    <input type="text" class="form-control" placeholder="Enter ..." v-model="procedure" @keypress.enter.prevent="register(2)">
+                    <input type="text" class="form-control" placeholder="Enter..." v-model="procedure" @keypress.enter.prevent="register(2)">
+                    <button type="button" class="btn btn-primary" @click="register(2)">
+                        <i class="fa fa-plus"></i>
+                      </button>
                   </li>
                 </ul>
               </div>

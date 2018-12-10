@@ -46,7 +46,7 @@ return [
     |
     */
 
-    'credits' => '<a href="#">Renny Suárez</a>',
+    'credits' => '<a href="#">APLICACIÓN DESARROLLADA POR LA UNIDAD DE DESARROLLO Y PROGRAMACIÓN - OTIC <span class="fa fa-copyright"></span> Copyleft</a>',
 
     /*
     |--------------------------------------------------------------------------

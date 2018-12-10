@@ -60,4 +60,9 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Models\Permisologia\Permission::class);
     }
+
+    public function specialties()
+    {
+        return $this->belongsToMany(Models\Specialty::class);
+    }
 }

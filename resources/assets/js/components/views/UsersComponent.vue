@@ -19,7 +19,7 @@
             class="btn btn-default btn-xs"
             data-tooltip="tooltip"
             title="Borrar Usuario"
-            @click="deleted('/admin/users/'+user, $children[1].get, 'fullName')"
+            @click="deleted('/admin/users/'+user, $children, 'fullName')"
             v-show="user"
             v-if="can('user.destroy')"><span class="glyphicon glyphicon-trash"></span></button>
             <a
@@ -29,12 +29,12 @@
             v-show="user"
             v-if="can('user.initWithOneUser')"
             :href="'/admin/init-session-user/'+user"><span class="glyphicon glyphicon-user"></span></a>
-            <v-modal-form :formData="formData" @input="$children[1].get()" v-if="can(['user.store','user.update'])"></v-modal-form>
+            <v-modal-form :formData="formData" @input="updateTable($children)" v-if="can(['user.store','user.update'])"></v-modal-form>
         </div>
         <div class="box-body">
             <div class="row">
                 <div class="col-md-12">
-                    <v-table id="users" :tabla="tabla   " uri="/admin/users" @output="user = arguments[0]"></v-table>
+                    <v-table id="users" :tabla="tabla" uri="/admin/users" @output="user = arguments[0]"></v-table>
                 </div>
             </div>
         </div>

@@ -133,7 +133,7 @@
             this.openForm('edit', id);
           }, action: 'insumo.update'},
           { ico: 'fa fa-close', class: 'btn-danger', title: 'Borrar Insumo', func: (id) => {
-            this.deleted('/insumo/'+id, this.get, 'insumo'); }, action: 'insumo.destroy'},
+            this.deleted('/insumo/'+id, this.$children, 'insumo'); }, action: 'insumo.destroy'},
             ]
           }
         };

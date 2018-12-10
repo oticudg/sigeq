@@ -24,7 +24,7 @@
                   <td>{{ data.last_name }}</td>
                 </tr>
                 <tr>
-                  <th>Cedula:</th>
+                  <th>Cédula:</th>
                   <td>{{ data.num_id }}</td>
                 </tr>
                 <tr>
@@ -56,7 +56,7 @@
                   <td>{{ data.parish }}</td>
                 </tr>
                 <tr>
-                  <th>Direccion:</th>
+                  <th>Dirección:</th>
                   <td>{{ data.address }}</td>
                 </tr>
               </tbody>
@@ -64,7 +64,7 @@
           </div>
         </div>
         <div class="col-xs-6">
-          <p class="lead">Datos de Intervencion Quirurgica</p>
+          <p class="lead">Datos de Intervención Quirurgica</p>
           <div class="table-responsive">
             <table class="table table-condensed table-hover table-striped table-bordered">
               <tbody>
@@ -77,7 +77,7 @@
                   <td>{{ data.classification }}</td>
                 </tr>
                 <tr>
-                  <th>Tipo de intervencion:</th>
+                  <th>Tipo de intervención:</th>
                   <td>{{ data.intervention }}</td>
                 </tr>
                 <tr>
@@ -89,7 +89,7 @@
                   <td>{{ data.asic }}</td>
                 </tr>
                 <tr>
-                  <th>Medico tratante:</th>
+                  <th>Médico tratante:</th>
                   <td>{{ data.doctor }}</td>
                 </tr>
                 <tr>
@@ -101,7 +101,7 @@
                   <td>{{ data.num_history }}</td>
                 </tr>
                 <tr>
-                  <th>Diagnostico:</th>
+                  <th>Diagnóstico:</th>
                   <td>{{ data.diagnosis }}</td>
                 </tr>
                 <tr>

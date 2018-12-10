@@ -42,6 +42,18 @@
                     <span v-text="msg.roles"></span>
                   </small>
                 </div>
+
+                <div class="form-group">
+                  <label for="speciality_id" class="control-label">
+                    <span class="glyphicon glyphicon-compressed"></span> Especialidades:
+                  </label>
+                  <v-multiselect v-model="formData.user.specialities" :options="select2_options(specialties)" :multiple="true" :hide-selected="true" :close-on-select="false"></v-multiselect>
+                  <small id="speciality_idHelp" class="form-text text-muted">
+                    <span v-text="msg.speciality_id"></span>
+                  </small>
+                </div>
+
+
               </div>
             </div>
 
@@ -87,6 +99,7 @@
         },
         modules: [],
         roles: [],
+        specialties: [],
         msg: {
           user: 'Usuario unico.',
           name: 'Nombre del usuario.',
@@ -96,33 +109,34 @@
           password: 'Contraseña.',
           password_confirmation: 'Confirmación de Contraseña.',
           roles: 'Rol a desempeñar.',
+          specialities: 'Seleccione las Especialidades'
         }
       };
     },
     mounted: function () {
       axios.post('/admin/get-data-users')
       .then(response => {
-        this.modules = response.data.modules;
         this.roles = response.data.roles;
+        this.specialties = response.data.specialties;
       });
     },
     methods: {
       registrar: function (el) {
-        $(el.target).attr('disabled', 'disabled')
         this.restoreMsg(this.msg);
+        this.formData.user.speciality_id = this.select2_search(this.specialties, this.formData.user.specialities);
         if (this.formData.cond === 'create') {
           axios.post(this.formData.url, this.formData.user)
           .then(response => {
-            toastr.success('Usuario Creado Exitosamente');
+            toastr.success('Registro Creado');
             this.$emit('input');
-            $('#user-form').modal('toggle');
+            $('#user-form').modal('hide');
           });
         } else {
           axios.put(this.formData.url, this.formData.user)
           .then(response => {
-            toastr.success('Usuario Editado Exitosamente');
+            toastr.success('Registro Editado');
             this.$emit('input');
-            $('#user-form').modal('toggle');
+            $('#user-form').modal('hide');
           });
         }
       }

@@ -132,7 +132,7 @@
 							<option>Ti@</option>
 							<option>Herman@</option>
 							<option>Abuel@</option>
-							<option>Espos@</option>
+							<option>Conyuge</option>
 							<option>Otr@</option>
 						</select>
 						<small id="relationHelp" class="form-text text-muted">

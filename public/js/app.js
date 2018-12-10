@@ -48388,25 +48388,67 @@ __WEBPACK_IMPORTED_MODULE_0_vue___default.a.mixin({
 				}
 				return false;
 			}
-			return this.$root.permissions.includes(accion);
+			return permissions.includes(accion);
+		},
+		isFunction: function isFunction(functionToCheck) {
+			return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
+		},
+		updateTable: function updateTable(test) {
+			for (var i in test) {
+				if (this.isFunction(test[i].get)) {
+					test[i].get();
+					return;
+				}
+			}
+		},
+		select2_search: function select2_search(data, val) {
+			if (Array.isArray(val)) {
+				var a = [];
+				for (var i in val) {
+					for (var d in data) {
+						if (data[d].text == val[i]) {
+							a.push(data[d].id);
+						}
+					}
+				}
+				return a;
+			} else {
+				for (var _i in data) {
+					if (data[_i].text == val) {
+						return data[_i].id;
+					}
+				}
+			}
+		},
+		select2_options: function select2_options(data) {
+			var options = [];
+			for (var i in data) {
+				options.push(data[i].text);
+			}
+			return options;
 		},
 		restoreMsg: function restoreMsg(msg) {
 			for (var i in msg) {
 				$('.modal small#' + i + 'Help').text(msg[i]);
 			}
 		},
-		deleted: function deleted(url, updateTable, name) {
+		deleted: function deleted(url, table, name) {
+			var _this = this;
+
 			var msg = toastr;
 			msg.options.tapToDismiss = false;
 			axios.get(url).then(function (response) {
 				msg.info(response.data[name] + '<br /><br /><button id="btn-delete" type="button" class="btn btn-success">Si</button> <button id="no-delete" type="button" class="btn btn-danger" role="button">No</button>', 'Esta seguro de Borrar este Elemento?');
 			}).then(function () {
 				$('button#btn-delete').click(function () {
-					// $(this).parent().parent().parent().fadeOut();
 					toastr.remove();
 					toastr.clear();
 					axios.delete(url).then(function (response) {
-						updateTable();
+						if (_this.isFunction(table)) {
+							table();
+						} else {
+							_this.updateTable(table);
+						}
 						toastr.success('Borrado Exitosamente');
 					});
 				});
@@ -48434,13 +48476,13 @@ var app = new __WEBPACK_IMPORTED_MODULE_0_vue___default.a({
 	},
 	components: { App: __WEBPACK_IMPORTED_MODULE_3__components_App_vue___default.a },
 	mounted: function mounted() {
-		var _this = this;
+		var _this2 = this;
 
 		if (location.href.indexOf('/login') > 0) return;
 		if (location.href.indexOf('/registro') > 0) return;
 
 		axios.post('/app', { rs: 'p' }).then(function (response) {
-			_this.permissions = response.data;
+			_this2.permissions = response.data;
 		});
 	}
 }).$mount('#app');
@@ -63799,9 +63841,11 @@ var router = new __WEBPACK_IMPORTED_MODULE_0_vue_router__["a" /* default */]({
 });
 
 router.beforeEach(function (to, from, next) {
-	return next();
 	// let permission = to.name;
-	// if (to.path == '/') {next(); return;}
+	if (to.path == '/') {
+		return;
+	}
+	return next();
 	// if (to.path == '/test') {next(); return;}
 	// if (location.href.indexOf('/login') != -1) return;
 	// if (location.href.indexOf('/registro') != -1) return;
@@ -63831,12 +63875,6 @@ router.afterEach(function (to, from, next) {
 	setTimeout(function () {
 		$('[data-tooltip="tooltip"]').tooltip();
 	}, 1000);
-	/*
- let breadcrumb = to.path.split('/').join(' > ');
- do {breadcrumb = breadcrumb.replace('-', ' ');} while(breadcrumb.indexOf('-') != -1);
- $('#breadcrumb').text(breadcrumb.toUpperCase());
- if (to.path == '/') $('#breadcrumb').text(' > Dashboard');
- */
 });
 
 /* harmony default export */ __webpack_exports__["a"] = (router);
@@ -64308,17 +64346,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 
 
@@ -64614,52 +64641,13 @@ var render = function() {
           )
         ]),
         _vm._v(" "),
-        _vm._m(0),
-        _vm._v(" "),
         _c("v-menu")
       ],
       1
     )
   ])
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c(
-      "form",
-      {
-        staticClass: "sidebar-form",
-        attrs: { action: "#", method: "get", id: "sidebar-form" }
-      },
-      [
-        _c("div", { staticClass: "input-group" }, [
-          _c("input", {
-            staticClass: "form-control",
-            attrs: {
-              type: "text",
-              name: "q",
-              placeholder: "Search...",
-              id: "search-input"
-            }
-          }),
-          _vm._v(" "),
-          _c("span", { staticClass: "input-group-btn" }, [
-            _c(
-              "button",
-              {
-                staticClass: "btn btn-flat",
-                attrs: { type: "submit", name: "search", id: "search-btn" }
-              },
-              [_c("i", { staticClass: "fa fa-search" })]
-            )
-          ])
-        ])
-      ]
-    )
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 module.exports = { render: render, staticRenderFns: staticRenderFns }
 if (false) {
@@ -67001,6 +66989,18 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -67022,6 +67022,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       },
       modules: [],
       roles: [],
+      specialties: [],
       msg: {
         user: 'Usuario unico.',
         name: 'Nombre del usuario.',
@@ -67030,7 +67031,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         email: 'Correo electronico.',
         password: 'Contraseña.',
         password_confirmation: 'Confirmación de Contraseña.',
-        roles: 'Rol a desempeñar.'
+        roles: 'Rol a desempeñar.',
+        specialities: 'Seleccione las Especialidades'
       }
     };
   },
@@ -67039,27 +67041,27 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     var _this = this;
 
     axios.post('/admin/get-data-users').then(function (response) {
-      _this.modules = response.data.modules;
       _this.roles = response.data.roles;
+      _this.specialties = response.data.specialties;
     });
   },
   methods: {
     registrar: function registrar(el) {
       var _this2 = this;
 
-      $(el.target).attr('disabled', 'disabled');
       this.restoreMsg(this.msg);
+      this.formData.user.speciality_id = this.select2_search(this.specialties, this.formData.user.specialities);
       if (this.formData.cond === 'create') {
         axios.post(this.formData.url, this.formData.user).then(function (response) {
-          toastr.success('Usuario Creado Exitosamente');
+          toastr.success('Registro Creado');
           _this2.$emit('input');
-          $('#user-form').modal('toggle');
+          $('#user-form').modal('hide');
         });
       } else {
         axios.put(this.formData.url, this.formData.user).then(function (response) {
-          toastr.success('Usuario Editado Exitosamente');
+          toastr.success('Registro Editado');
           _this2.$emit('input');
-          $('#user-form').modal('toggle');
+          $('#user-form').modal('hide');
         });
       }
     }
@@ -67472,6 +67474,63 @@ var render = function() {
                               )
                             ],
                             1
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "div",
+                            { staticClass: "form-group" },
+                            [
+                              _c(
+                                "label",
+                                {
+                                  staticClass: "control-label",
+                                  attrs: { for: "speciality_id" }
+                                },
+                                [
+                                  _c("span", {
+                                    staticClass:
+                                      "glyphicon glyphicon-compressed"
+                                  }),
+                                  _vm._v(" Especialidades:\n                ")
+                                ]
+                              ),
+                              _vm._v(" "),
+                              _c("v-multiselect", {
+                                attrs: {
+                                  options: _vm.select2_options(_vm.specialties),
+                                  multiple: true,
+                                  "hide-selected": true,
+                                  "close-on-select": false
+                                },
+                                model: {
+                                  value: _vm.formData.user.specialities,
+                                  callback: function($$v) {
+                                    _vm.$set(
+                                      _vm.formData.user,
+                                      "specialities",
+                                      $$v
+                                    )
+                                  },
+                                  expression: "formData.user.specialities"
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c(
+                                "small",
+                                {
+                                  staticClass: "form-text text-muted",
+                                  attrs: { id: "speciality_idHelp" }
+                                },
+                                [
+                                  _c("span", {
+                                    domProps: {
+                                      textContent: _vm._s(_vm.msg.speciality_id)
+                                    }
+                                  })
+                                ]
+                              )
+                            ],
+                            1
                           )
                         ],
                         2
@@ -67606,7 +67665,7 @@ var render = function() {
                   click: function($event) {
                     _vm.deleted(
                       "/admin/users/" + _vm.user,
-                      _vm.$children[1].get,
+                      _vm.$children,
                       "fullName"
                     )
                   }
@@ -67644,7 +67703,7 @@ var render = function() {
               attrs: { formData: _vm.formData },
               on: {
                 input: function($event) {
-                  _vm.$children[1].get()
+                  _vm.updateTable(_vm.$children)
                 }
               }
             })
@@ -74013,7 +74072,7 @@ var render = function() {
                   _vm._v(" "),
                   _c("option", [_vm._v("Abuel@")]),
                   _vm._v(" "),
-                  _c("option", [_vm._v("Espos@")]),
+                  _c("option", [_vm._v("Conyuge")]),
                   _vm._v(" "),
                   _c("option", [_vm._v("Otr@")])
                 ]
@@ -74973,7 +75032,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         options: [{ ico: 'fa fa-edit', class: 'btn-info', title: 'Editar Insumo', func: function func(id) {
             _this.openForm('edit', id);
           }, action: 'insumo.update' }, { ico: 'fa fa-close', class: 'btn-danger', title: 'Borrar Insumo', func: function func(id) {
-            _this.deleted('/insumo/' + id, _this.get, 'insumo');
+            _this.deleted('/insumo/' + id, _this.$children, 'insumo');
           }, action: 'insumo.destroy' }]
       }
     };
@@ -76102,6 +76161,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: 'Procedures',
@@ -76375,7 +76440,21 @@ var render = function() {
                                 _vm.procedure = $event.target.value
                               }
                             }
-                          })
+                          }),
+                          _vm._v(" "),
+                          _c(
+                            "button",
+                            {
+                              staticClass: "btn btn-primary",
+                              attrs: { type: "button" },
+                              on: {
+                                click: function($event) {
+                                  _vm.register(1)
+                                }
+                              }
+                            },
+                            [_c("i", { staticClass: "fa fa-plus" })]
+                          )
                         ])
                       ],
                       2
@@ -76543,7 +76622,7 @@ var render = function() {
                             }
                           ],
                           staticClass: "form-control",
-                          attrs: { type: "text", placeholder: "Enter ..." },
+                          attrs: { type: "text", placeholder: "Enter..." },
                           domProps: { value: _vm.procedure },
                           on: {
                             keypress: function($event) {
@@ -76563,7 +76642,21 @@ var render = function() {
                               _vm.procedure = $event.target.value
                             }
                           }
-                        })
+                        }),
+                        _vm._v(" "),
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-primary",
+                            attrs: { type: "button" },
+                            on: {
+                              click: function($event) {
+                                _vm.register(2)
+                              }
+                            }
+                          },
+                          [_c("i", { staticClass: "fa fa-plus" })]
+                        )
                       ])
                     ],
                     2
@@ -77306,7 +77399,7 @@ var render = function() {
                   ]),
                   _vm._v(" "),
                   _c("tr", [
-                    _c("th", [_vm._v("Cedula:")]),
+                    _c("th", [_vm._v("Cédula:")]),
                     _vm._v(" "),
                     _c("td", [_vm._v(_vm._s(_vm.data.num_id))])
                   ]),
@@ -77356,7 +77449,7 @@ var render = function() {
                   ]),
                   _vm._v(" "),
                   _c("tr", [
-                    _c("th", [_vm._v("Direccion:")]),
+                    _c("th", [_vm._v("Dirección:")]),
                     _vm._v(" "),
                     _c("td", [_vm._v(_vm._s(_vm.data.address))])
                   ])
@@ -77368,7 +77461,7 @@ var render = function() {
         _vm._v(" "),
         _c("div", { staticClass: "col-xs-6" }, [
           _c("p", { staticClass: "lead" }, [
-            _vm._v("Datos de Intervencion Quirurgica")
+            _vm._v("Datos de Intervención Quirurgica")
           ]),
           _vm._v(" "),
           _c("div", { staticClass: "table-responsive" }, [
@@ -77395,7 +77488,7 @@ var render = function() {
                   ]),
                   _vm._v(" "),
                   _c("tr", [
-                    _c("th", [_vm._v("Tipo de intervencion:")]),
+                    _c("th", [_vm._v("Tipo de intervención:")]),
                     _vm._v(" "),
                     _c("td", [_vm._v(_vm._s(_vm.data.intervention))])
                   ]),
@@ -77413,7 +77506,7 @@ var render = function() {
                   ]),
                   _vm._v(" "),
                   _c("tr", [
-                    _c("th", [_vm._v("Medico tratante:")]),
+                    _c("th", [_vm._v("Médico tratante:")]),
                     _vm._v(" "),
                     _c("td", [_vm._v(_vm._s(_vm.data.doctor))])
                   ]),
@@ -77431,7 +77524,7 @@ var render = function() {
                   ]),
                   _vm._v(" "),
                   _c("tr", [
-                    _c("th", [_vm._v("Diagnostico:")]),
+                    _c("th", [_vm._v("Diagnóstico:")]),
                     _vm._v(" "),
                     _c("td", [_vm._v(_vm._s(_vm.data.diagnosis))])
                   ]),

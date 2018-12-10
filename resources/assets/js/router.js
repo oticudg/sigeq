@@ -96,9 +96,9 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
-	return next();
 	// let permission = to.name;
-	// if (to.path == '/') {next(); return;}
+	if (to.path == '/') { return;}
+	return next();
 	// if (to.path == '/test') {next(); return;}
 	// if (location.href.indexOf('/login') != -1) return;
 	// if (location.href.indexOf('/registro') != -1) return;
@@ -128,12 +128,6 @@ router.afterEach((to, from, next) => {
 	setTimeout(function () {
 		$('[data-tooltip="tooltip"]').tooltip();
 	}, 1000);
-	/*
-	let breadcrumb = to.path.split('/').join(' > ');
-	do {breadcrumb = breadcrumb.replace('-', ' ');} while(breadcrumb.indexOf('-') != -1);
-	$('#breadcrumb').text(breadcrumb.toUpperCase());
-	if (to.path == '/') $('#breadcrumb').text(' > Dashboard');
-	*/
 });
 
 export default router;

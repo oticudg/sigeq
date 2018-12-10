@@ -21,20 +21,23 @@ class FichasController extends Controller
         if (!is_null(request()->date_f) && request()->date_f != 'null') {
             $date_f = \Carbon::parse(request()->date_f);
         } else {$date_f = \Carbon::now();}
-        $select = ['id', 'name', 'last_name', 'created_at', 'num_history', 'date_insumo','date_check_pre', 'date_interconsultas', 'date_valoration_pre', 'speciality_id', 'operation'];
+        $select = ['id', 'name', 'last_name', 'created_at', 'num_history', 'date_insumo','date_check_pre', 'date_interconsultas', 'date_valoration_pre', 'speciality_id', 'operation', 'apto'];
         $ficha = Ficha::orderBy(request()->order?:'id', request()->dir?:'ASC')
         ->search(request()->search)
+        ->whereIn('speciality_id', \Auth::user()->specialties->pluck('id')->toArray())
         ->where('speciality_id', ((request()->speciality_id) ? '=' : '!='), request()->speciality_id)
         ->whereBetween('created_at', [$date_i, $date_f])
         ->select($select)
         ->paginate(request()->num?:10);
         $ficha->each(function ($f) {
-            $f->speciality_id = $f->speciality['name'];
-
-            $f->name = $f->name . ' ' . $f->last_name;
+            if ($f->date_insumo && $f->date_check_pre && $f->date_interconsultas && $f->date_valoration_pre && $f->apto == 'si') {
+                $f->operation = '<a href="' . url('/show/' . $f->id) . '">Registrar Fecha</a>';
+            }
+            $f->speciality_id = $f->speciality->intervention->name[0] . ' - ' . $f->speciality->name;
+            $f->name = strtoupper($f->fullName());
             $f->created = $f->created_at->format('d-m-Y');
+            unset($f->speciality);
         });
-        // &data=1&=&=&=
         return $this->dataWithPagination($ficha);
     }
 
@@ -63,7 +66,7 @@ class FichasController extends Controller
             'municipality' => 'required|numeric',
             'name' => 'required|string|min:3|max:50',
             'name_c' => 'nullable|string|min:3|max:50',
-            'num_history' => 'required|numeric',
+            'num_history' => 'required|numeric|digits_between:4,9',
             'num_id' => 'required|numeric|digits_between:6,13',
             'num_id_c' => 'nullable|numeric|digits_between:6,9',
             'pa' => 'nullable|numeric|digits_between:1,2',
@@ -189,8 +192,8 @@ class FichasController extends Controller
             // 'pa' => 'required|numeric|digits_between:1,2',
             'parish' => 'required|numeric',
             // 'pathology' => 'required|string|max:150|min:3',
-            'phone' => 'required|numeric|digits_between:6,9',
-            'phone_c' => 'nullable|numeric|digits_between:6,9',
+            'phone' => 'nullable|numeric|digits_between:6,14',
+            'phone_c' => 'nullable|numeric|digits_between:6,14',
             'relation_c' => 'nullable|string',
             'sex' => 'required|boolean',
             'size' => 'nullable|numeric',
@@ -261,7 +264,11 @@ class FichasController extends Controller
             $a->name = $a->name . ' - ' . $a->description;
         });
         $type_patients = TypePatient::get(['id', 'name']);
-        $interventions = Intervention::get(['id', 'name']);
+        $interventions = [];
+        foreach (\Auth::user()->specialties as $s) {
+            if (!in_array($s->intervention_id, $interventions)) $interventions[] = $s->intervention_id;
+        }
+        $interventions = Intervention::whereIn('id', $interventions)->get(['id', 'name']);
         $classifications = Classification::get(['id', 'name']);
         return response()->json(compact('states', 'health_centers', 'pathologies', 'requests', 'type_patients', 'interventions', 'classifications', 'asics'));
     }
@@ -280,7 +287,9 @@ class FichasController extends Controller
 
     public function getspeciality(Request $request)
     {
-        $specialties = Specialty::where('intervention_id', '=', $request->id)->get(['name', 'id']);
+        $specialties = Specialty::where('intervention_id', '=', $request->id)
+        ->whereIn('id', \Auth::user()->specialties->pluck('id'))
+        ->get(['name', 'id']);
         return response()->json(compact('specialties'));
     }
 
